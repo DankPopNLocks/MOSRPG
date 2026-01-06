@@ -186,7 +186,8 @@ Controls game initialization from the lobby
 2. Optional majority-vote or instant-start logic
 3. Connects with MOSRPG_RoleManager
 4. Defines lobby spawn location
-5. Sets game duration • Handles automatic game reset
+5. Sets game duration
+6. Handles automatic game reset
 
 This system acts as the bridge between lobby setup and active gameplay, ensuring roles, spawns, and timers are initialized consistently.
 
