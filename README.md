@@ -195,14 +195,15 @@ This system acts as the bridge between lobby setup and active gameplay, ensuring
 ## 🤝 Contributions
 
 MOSRPG is designed to be:
-• Modular
-• Community-driven
-• Easily configurable
+1. Modular
+2. Community-driven
+3. Easily configurable
 
 Feel free to:
-• Submit pull requests
-• Open issues
-• Fork and customize
+1. Submit pull requests
+2. Open issues
+3. Fork and customize
+4. Use for commercial projects as long as it is not a direct replicative of this source material (you must create your own game and do -not- sell this source!)
 
 ---
 
