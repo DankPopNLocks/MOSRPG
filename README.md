@@ -101,8 +101,6 @@ Handles equippable items and combat stats. Executes damage logic when a valid hi
 7. Supports player and enemy usage
 8. Optional movement slowdown effects
 
-The Gear Manager separates **equipment data** from **damage execution**, allowing weapons to be stored without necessarily being active.
-
 Weapons can now exist purely as inventory or world objects **without automatically dealing damage**, allowing safer storage and staged activation.
 
 ---
