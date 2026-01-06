@@ -225,10 +225,10 @@ www.patreon.com/DankPopNLocks
 ChatGPT by OpenAI
 
 ChatGPT was used for:
-• Architectural planning
-• Debugging assistance
-• Refactoring guidance
-• Documentation drafting
+1. Architectural planning
+2. Debugging assistance
+3. Refactoring guidance
+4. Documentation drafting
 
 Human review, testing, and integration were always performed by the project author.
 
