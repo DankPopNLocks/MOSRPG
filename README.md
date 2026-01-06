@@ -19,12 +19,12 @@ Contributions, refactors, and improvements from the community are welcome.
 
 **Key changes v0.3**
 
-• Clear separation of responsibilities between systems
-• Consistent `MOSRPG_` naming convention
-• Improved modularity and extensibility
-• Reworked combat and respawn logic
-• Reduced script coupling and circular dependencies
-• More explicit inspector-driven workflows
+1. Clear separation of responsibilities between systems
+2. Consistent `MOSRPG_` naming convention
+3. Improved modularity and extensibility
+4. Reworked combat and respawn logic
+5. Reduced script coupling and circular dependencies
+6. More explicit inspector-driven workflows
 
 ---
 
@@ -36,10 +36,10 @@ Contributions, refactors, and improvements from the community are welcome.
 4. If dragging the prefab into an existing scene, **zero the parent transform position**.
 
 You will now have:
-• Core MOSRPG systems
-• Example items
-• Test enemy
-• Basic UI and respawn setup
+1. Core MOSRPG systems
+2. Example items
+3. Test enemy
+4. Basic UI and respawn setup
 
 From here, you can freely customize layouts, values, prefabs, and logic.
 
@@ -49,12 +49,12 @@ From here, you can freely customize layouts, values, prefabs, and logic.
 
 Central authority for health state management for both players & enemy AI.
 
-• Tracks current and maximum health
-• Differentiates between player and enemy entities
-• Sends death events
-• Interfaces with `MOSRPG_RespawnManager`
-* UI health displays
-* Damage sources
+1. Tracks current and maximum health
+2. Differentiates between player and enemy entities
+3. Sends death events
+4. Interfaces with `MOSRPG_RespawnManager`
+5. UI health displays
+6. Damage sources
 
 This script ensures health logic remains consistent and synchronized across network interactions.
 
@@ -64,10 +64,10 @@ This script ensures health logic remains consistent and synchronized across netw
 
 Unified respawn logic for both players and enemies.
 
-• Stores spawn points or checkpoints
-• Handles delayed respawns
-• Resets health and state on respawn
-• Supports multiple respawn zones
+1. Stores spawn points or checkpoints
+2. Handles delayed respawns
+3. Resets health and state on respawn
+4. Supports multiple respawn zones
 
 This system allows designers to create **checkpoint-style respawning** independent of VRChat's menu respawn.
 
@@ -77,12 +77,12 @@ This system allows designers to create **checkpoint-style respawning** independe
 
 Manages player inventory logic and UI.
 
-• Defines inventory size
-• Stores item references
-• Handles cycling, selection, and storage
-• Controls raycast-based spawning
-• Assigns inventory icons
-• Keybind support for cycling and usage
+1. Defines inventory size
+2. Stores item references
+3. Handles cycling, selection, and storage
+4. Controls raycast-based spawning
+5. Assigns inventory icons
+6. Keybind support for cycling and usage
 
 The Inventory Manager is designed to be **agnostic of item behavior**, delegating logic to item-specific scripts.
 
@@ -92,14 +92,14 @@ The Inventory Manager is designed to be **agnostic of item behavior**, delegatin
 
 Handles equippable items and combat stats. Executes damage logic when a valid hit occurs.
 
-• Defines inventory sprite
-• Sets weapon collider references
-• Controls minimum and maximum damage
-• Manages damage cooldown intervals
-• Applies damage to valid `MOSRPG_ResourceManager` targets
-• Respects cooldowns and damage ranges
-• Supports player and enemy usage
-• Optional movement slowdown effects
+1. Defines inventory sprite
+2. Sets weapon collider references
+3. Controls minimum and maximum damage
+4. Manages damage cooldown intervals
+5. Applies damage to valid `MOSRPG_ResourceManager` targets
+6. Respects cooldowns and damage ranges
+7. Supports player and enemy usage
+8. Optional movement slowdown effects
 
 The Gear Manager separates **equipment data** from **damage execution**, allowing weapons to be stored without necessarily being active.
 
@@ -111,13 +111,13 @@ Weapons can now exist purely as inventory or world objects **without automatical
 
 Handles player interaction with world objects and defines how items may be used.
 
-• Pickup logic
-• Interaction gating
-• Delegation to Inventory or Item systems
-• Connects items to `MOSRPG_ResourceManager`
-• Applies healing or effects
-• Determines whether the item is consumed
-• Assigns inventory UI icon
+1. Pickup logic
+2. Interaction gating
+3. Delegation to Inventory or Item systems
+4. Connects items to `MOSRPG_ResourceManager`
+5. Applies healing or effects
+6. Determines whether the item is consumed
+7. Assigns inventory UI icon
 
 This allows consumables (e.g., potions) and utility items to share the same framework.
 
@@ -131,9 +131,9 @@ Also used to create role buttons, allowing you to set which team a player joins.
 
 Defines respawn locations that integrate with the unified respawn system.
 
-• Registers a respawn point with MOSRPG_RespawnManager
-• Updates the active checkpoint when entered
-• Supports checkpoint-style progression
+1. Registers a respawn point with MOSRPG_RespawnManager
+2. Updates the active checkpoint when entered
+3. Supports checkpoint-style progression
 
 Checkpoints allow creators to control where players return after death or falling out of bounds, independent of VRChat’s default respawn behavior.
 
@@ -143,9 +143,9 @@ Checkpoints allow creators to control where players return after death or fallin
 
 Manages player currency and basic economy interactions.
 
-• Tracks player currency values 
-• Allows currency collection and spending 
-• Provides a centralized reference for shops or rewards
+1. Tracks player currency values 
+2. Allows currency collection and spending 
+3. Provides a centralized reference for shops or rewards
 
 This system is intentionally lightweight and can be expanded to support vendors, upgrades, or rewards.
 
@@ -155,16 +155,16 @@ This system is intentionally lightweight and can be expanded to support vendors,
 
 Assigns and manages player roles using indexed definitions.
 
-• Assigns roles based on index values
-• Supports single or multiple role configurations
-• Exposes role data for conditional logic
-• Defines role-based spawn locations
+1. Assigns roles based on index values
+2. Supports single or multiple role configurations
+3. Exposes role data for conditional logic
+4. Defines role-based spawn locations
 
 Roles can be used to:
-• Control player abilities
-• Restrict equipment
-• Gate interactions
-• Spawn players at designated locations when the game begins
+1. Control player abilities
+2. Restrict equipment
+3. Gate interactions
+4. Spawn players at designated locations when the game begins
 
 ---
 
@@ -172,9 +172,9 @@ Roles can be used to:
 
 Displays active players in the lobby UI.
 
-• Tracks joined players
-• Updates UI name lists dynamically
-• Reflects lobby state before game start
+1. Tracks joined players
+2. Updates UI name lists dynamically
+3. Reflects lobby state before game start
 
 This helps players understand who is present and ready before a session begins and can also be used to reflect who is active in the game on the player's HUD.
 
@@ -184,11 +184,11 @@ This helps players understand who is present and ready before a session begins a
 
 Controls game initialization from the lobby
 
-• Allows the instance master to start the game
-• Optional majority-vote or instant-start logic
-• Connects with MOSRPG_RoleManager
-• Defines lobby spawn location
-• Sets game duration • Handles automatic game reset
+1. Allows the instance master to start the game
+2. Optional majority-vote or instant-start logic
+3. Connects with MOSRPG_RoleManager
+4. Defines lobby spawn location
+5. Sets game duration • Handles automatic game reset
 
 This system acts as the bridge between lobby setup and active gameplay, ensuring roles, spawns, and timers are initialized consistently.
 
