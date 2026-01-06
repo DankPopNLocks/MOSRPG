@@ -204,7 +204,7 @@ Feel free to:
 1. Submit pull requests
 2. Open issues
 3. Fork and customize
-4. Use for commercial projects as long as it is not a direct replicative of this source material (you must create your own game and do -not- sell this source!)
+4. Use for commercial projects as long as it is not a direct replicative of this source material (you must create your own game and do -not- sell this source!) Please credit https://github.com/DankPopNLocks/MOSRPG/ as the source, thank you!
 
 ---
 
