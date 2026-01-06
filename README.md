@@ -195,10 +195,10 @@ This system acts as the bridge between lobby setup and active gameplay, ensuring
 
 ## 🤝 Contributions
 
-MOSRPG is designed to be:
-1. Modular
-2. Community-driven
-3. Easily configurable
+MOSRPG is designed to have:
+1. Modular & inspector Focused creative workflow
+2. Community inspired feature integration
+3. Easily configurable scripting with clear documentation
 
 Feel free to:
 1. Submit pull requests
