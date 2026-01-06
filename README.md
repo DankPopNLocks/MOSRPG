@@ -217,6 +217,10 @@ DankPopNLocks
 Autumn,
 TheXev
 
+**Patreon Supporters**
+Thank you to everyone who supports my development work, I hope these tools help you and others!
+www.patreon.com/DankPopNLocks
+
 **AI Development Assistance:**
 ChatGPT by OpenAI
 
