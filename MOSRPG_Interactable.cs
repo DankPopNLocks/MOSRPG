@@ -7,54 +7,42 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class MOSRPG_Interactable : UdonSharpBehaviour
 {
-    [Header("Inventory")]
-    public bool canBeStored = false;
-
     [Header("General")]
+    public bool isInteractable = true;
     public string interactableName;
     public Sprite icon;
 
-    [Header("Pickup / Use (Optional)")]
+    [Header("Inventory / Consumable")]
+    public bool canBeStored = false;
     public bool destroyAfterUse = true;
+
+    [Tooltip("Target resource affected by this item")]
     public MOSRPG_ResourceManager resourceTarget;
-    public MOSRPG_EconomyManager economyManager;
+
     [Tooltip("Positive = heal / add currency, Negative = damage")]
     public float effectAmount = 0f;
 
-    private VRC_Pickup pickup;
-    private VRCPlayerApi localPlayer;
+    public MOSRPG_EconomyManager economyManager;
 
-    [Header("Gear / Weapon (Optional)")]
-    public GameObject weaponObject;
-    public Collider weaponCollider;
-    public float minDamage = 5f;
-    public float maxDamage = 15f;
-    public float damageCooldown = 0.5f;
-    private float lastHitTime;
-
-    [Header("Animator / Button (Optional)")]
+    [Header("Animator / Button")]
     public Animator targetAnimator;
     public string[] animatorBoolParameters;
     public bool toggleMode = true;
     private bool currentToggleState;
 
-    [Header("Role Restrictions (Optional)")]
+    [Header("Role Restrictions")]
     public bool useRoleRestrictions = false;
     public MOSRPG_RoleManager roleManager;
     public int requiredRoleIndex = 0;
     public bool allowNoneRole = true;
 
-    [Header("Role Assignment (Optional)")]
+    [Header("Role Assignment")]
     public bool assignRoleOnInteract = false;
     public int roleIndexToAssign = 0;
-
-    [Header("Other Role Buttons (Assign in inspector)")]
     public MOSRPG_Interactable[] otherRoleButtons;
 
-    [Header("Lobby / UI (Optional)")]
+    [Header("Lobby / UI")]
     public MOSRPG_LobbyPlayerList lobbyPlayerList;
-
-    [Header("UI (Optional)")]
     public TextMeshProUGUI interactText;
     public string activeText = "Deactivate";
     public string inactiveText = "Activate";
@@ -62,39 +50,38 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
     [Header("Debug")]
     public bool debugLogs = false;
 
-    // ---------------- Initialization ----------------
+    private VRC_Pickup pickup;
+    private VRCPlayerApi localPlayer;
+
+    // ================= INITIALIZATION =================
+
     private void Start()
     {
         pickup = GetComponent<VRC_Pickup>();
         localPlayer = Networking.LocalPlayer;
-
-        if (weaponCollider != null)
-        {
-            weaponCollider.isTrigger = true;
-            weaponCollider.enabled = false;
-        }
-
-        if (weaponObject != null)
-            weaponObject.SetActive(false);
-
         UpdateInteractText();
     }
 
     private void Update()
     {
-        if (pickup == null || localPlayer == null) return;
-
-        if (pickup.IsHeld && pickup.currentPlayer == localPlayer)
+        if (pickup != null &&
+            pickup.IsHeld &&
+            pickup.currentPlayer == localPlayer &&
+            isInteractable)
         {
-            if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.JoystickButton1))
+            if (Input.GetKeyDown(KeyCode.E) ||
+                Input.GetKeyDown(KeyCode.JoystickButton1))
+            {
                 UseItem();
+            }
         }
     }
 
-    // ---------------- Use / Consumable Logic ----------------
+    // ================= CONSUMABLE LOGIC =================
+
     public void UseItem()
     {
-        if (!CanInteract()) return;
+        if (!isInteractable || !CanInteract()) return;
 
         if (resourceTarget != null && effectAmount != 0f)
         {
@@ -106,7 +93,10 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
 
         if (economyManager != null && effectAmount != 0f)
         {
-            economyManager.TryAddCurrency(localPlayer, Mathf.RoundToInt(effectAmount));
+            economyManager.TryAddCurrency(
+                localPlayer,
+                Mathf.RoundToInt(effectAmount)
+            );
         }
 
         if (destroyAfterUse)
@@ -128,10 +118,11 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
         gameObject.SetActive(false);
     }
 
-    // ---------------- Interaction ----------------
+    // ================= INTERACTION =================
+
     public override void Interact()
     {
-        if (!CanInteract()) return;
+        if (!isInteractable || !CanInteract()) return;
 
         HandleRoleAssignment();
         HandleAnimatorToggle();
@@ -140,30 +131,18 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
 
     private bool CanInteract()
     {
-        if (!Utilities.IsValid(localPlayer))
-        {
-            if (debugLogs) Debug.Log("[MOSRPG_Interactable] Local player invalid");
-            return false;
-        }
-
-        if (!useRoleRestrictions)
-            return true;
-
-        if (!Utilities.IsValid(roleManager))
-        {
-            if (debugLogs) Debug.Log("[MOSRPG_Interactable] RoleManager not assigned, allowing interaction");
-            return true;
-        }
+        if (!Utilities.IsValid(localPlayer)) return false;
+        if (!useRoleRestrictions) return true;
+        if (!Utilities.IsValid(roleManager)) return true;
 
         int role = roleManager.GetPlayerRole(localPlayer.playerId);
-        if (debugLogs) Debug.Log($"[MOSRPG_Interactable] Player role: {role}, Required: {requiredRoleIndex}");
-
         if (allowNoneRole && role == 0) return true;
 
         return role == requiredRoleIndex;
     }
 
-    // ---------------- Role Assignment & Lobby Refresh ----------------
+    // ================= ROLE ASSIGNMENT =================
+
     private void HandleRoleAssignment()
     {
         if (!assignRoleOnInteract || !Utilities.IsValid(roleManager)) return;
@@ -174,8 +153,8 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
         {
             foreach (var btn in otherRoleButtons)
             {
-                if (!Utilities.IsValid(btn)) continue;
-                btn.RefreshButtonText();
+                if (Utilities.IsValid(btn))
+                    btn.RefreshButtonText();
             }
         }
 
@@ -190,12 +169,15 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
         UpdateInteractText();
     }
 
-    // ---------------- Animator ----------------
+    // ================= ANIMATOR =================
+
     private void HandleAnimatorToggle()
     {
         if (!Utilities.IsValid(targetAnimator)) return;
 
-        currentToggleState = toggleMode ? !currentToggleState : true;
+        currentToggleState = toggleMode
+            ? !currentToggleState
+            : true;
 
         foreach (var param in animatorBoolParameters)
         {
@@ -204,7 +186,8 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
         }
     }
 
-    // ---------------- UI ----------------
+    // ================= UI =================
+
     private void UpdateInteractText()
     {
         if (!Utilities.IsValid(interactText)) return;
@@ -212,44 +195,25 @@ public class MOSRPG_Interactable : UdonSharpBehaviour
         if (assignRoleOnInteract && Utilities.IsValid(roleManager))
         {
             int localId = Networking.LocalPlayer.playerId;
-            bool inRole = roleManager.IsPlayerInRole(localId, roleIndexToAssign);
-            interactText.text = inRole ? "Leave Team" : "Join Team";
+            bool inRole = roleManager.IsPlayerInRole(
+                localId,
+                roleIndexToAssign
+            );
+
+            interactText.text = inRole
+                ? "Leave Team"
+                : "Join Team";
         }
         else
         {
-            interactText.text = currentToggleState ? activeText : inactiveText;
+            interactText.text = currentToggleState
+                ? activeText
+                : inactiveText;
         }
     }
 
     public override void OnDeserialization()
     {
         UpdateInteractText();
-    }
-
-    // ---------------- Gear / Weapon ----------------
-    private void OnTriggerEnter(Collider other)
-    {
-        if (weaponCollider == null || !weaponCollider.enabled) return;
-        if (Time.time - lastHitTime < damageCooldown) return;
-
-        MOSRPG_ResourceManager resource = other.GetComponent<MOSRPG_ResourceManager>();
-        if (resource != null)
-        {
-            float dmg = Random.Range(minDamage, maxDamage);
-            resource.TakeDamage(dmg);
-            lastHitTime = Time.time;
-        }
-    }
-
-    public void Equip()
-    {
-        if (weaponCollider != null) weaponCollider.enabled = true;
-        if (weaponObject != null) weaponObject.SetActive(true);
-    }
-
-    public void Unequip()
-    {
-        if (weaponCollider != null) weaponCollider.enabled = false;
-        if (weaponObject != null) weaponObject.SetActive(false);
     }
 }

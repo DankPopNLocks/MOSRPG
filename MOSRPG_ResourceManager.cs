@@ -7,7 +7,7 @@ using TMPro;
 
 public class MOSRPG_ResourceManager : UdonSharpBehaviour
 {
-    [UdonSynced] public float health = 100.0f;
+    [UdonSynced] public float health = 100f;
 
     [Header("Health Settings")]
     public float maxHealth = 100f;
@@ -17,43 +17,57 @@ public class MOSRPG_ResourceManager : UdonSharpBehaviour
 
     public TextMeshProUGUI healthText;
 
-    [Header("Respawn Managers")]
-    public MOSRPG_PlayerRespawnManager playerRespawnManager;
-    public MOSRPG_EnemyRespawnManager enemyRespawnManager;
+    [Header("Respawn Manager")]
+    [Tooltip("Unified respawn manager for both players and enemies.")]
+    public MOSRPG_RespawnManager respawnManager;
 
-    [Tooltip("Set true if this is a player, false if an enemy.")]
+    [Tooltip("True = Player, False = Enemy")]
     public bool isPlayer = false;
+
+    // --- Player Speed Modification (optional) ---
+    private bool speedApplied = false;
+    private float originalWalk, originalRun, originalStrafe;
 
     private void Start()
     {
-        health = Mathf.Clamp(health, 0, maxHealth);
+        health = Mathf.Clamp(health, 0f, maxHealth);
         UpdateHealthUI();
     }
 
-    // ---------------- Resource Management ----------------
+    // ================= DAMAGE =================
 
     public void TakeDamage(float damageAmount)
     {
-        if (!Networking.IsOwner(gameObject)) return;
-        if (damageAmount <= 0) return;
+        if (damageAmount <= 0f) return;
+
+        if (!Networking.IsOwner(gameObject))
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            return;
+        }
 
         health -= damageAmount;
-        health = Mathf.Clamp(health, 0, maxHealth);
+        health = Mathf.Clamp(health, 0f, maxHealth);
 
         RequestSerialization();
         UpdateHealthUI();
 
-        if (health <= 0)
+        if (health <= 0f)
             HandleDeath();
     }
 
     public void Heal(float healAmount)
     {
-        if (!Networking.IsOwner(gameObject)) return;
-        if (healAmount <= 0) return;
+        if (healAmount <= 0f) return;
+
+        if (!Networking.IsOwner(gameObject))
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            return;
+        }
 
         health += healAmount;
-        health = Mathf.Clamp(health, 0, maxHealth);
+        health = Mathf.Clamp(health, 0f, maxHealth);
 
         RequestSerialization();
         UpdateHealthUI();
@@ -61,30 +75,32 @@ public class MOSRPG_ResourceManager : UdonSharpBehaviour
 
     public void ResetResource()
     {
-        if (!Networking.IsOwner(gameObject)) return;
+        if (!Networking.IsOwner(gameObject))
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            return;
+        }
 
         health = maxHealth;
         RequestSerialization();
         UpdateHealthUI();
     }
 
-    // ---------------- Death Handling ----------------
+    // ================= DEATH =================
 
     private void HandleDeath()
     {
-        if (isPlayer)
+        if (respawnManager != null)
         {
-            if (playerRespawnManager != null)
-                playerRespawnManager.RespawnPlayer(this);
+            respawnManager.HandleDeath(this);
         }
         else
         {
-            if (enemyRespawnManager != null)
-                enemyRespawnManager.HandleEnemyDeath(this);
+            Debug.LogWarning("[MOSRPG_ResourceManager] No RespawnManager assigned for " + gameObject.name);
         }
     }
 
-    // ---------------- UI Updates ----------------
+    // ================= UI =================
 
     private void UpdateHealthUI()
     {
@@ -95,18 +111,37 @@ public class MOSRPG_ResourceManager : UdonSharpBehaviour
             healthText.text = $"{health:0}/{maxHealth:0}";
     }
 
-    // ---------------- Networking Overrides ----------------
-
     public override void OnDeserialization()
     {
-        base.OnDeserialization();
-        health = Mathf.Clamp(health, 0, maxHealth);
+        health = Mathf.Clamp(health, 0f, maxHealth);
         UpdateHealthUI();
     }
 
-    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    // ================= SPEED MODIFICATION (Optional) =================
+
+    public void ApplySpeed(VRCPlayerApi player, float walk, float run, float strafe)
     {
-        base.OnOwnershipTransferred(player);
-        UpdateHealthUI(); // Refresh UI when ownership changes
+        if (!player.IsValid() || speedApplied) return;
+
+        originalWalk = player.GetWalkSpeed();
+        originalRun = player.GetRunSpeed();
+        originalStrafe = player.GetStrafeSpeed();
+
+        player.SetWalkSpeed(walk);
+        player.SetRunSpeed(run);
+        player.SetStrafeSpeed(strafe);
+
+        speedApplied = true;
+    }
+
+    public void RestoreSpeed(VRCPlayerApi player)
+    {
+        if (!player.IsValid() || !speedApplied) return;
+
+        player.SetWalkSpeed(originalWalk);
+        player.SetRunSpeed(originalRun);
+        player.SetStrafeSpeed(originalStrafe);
+
+        speedApplied = false;
     }
 }

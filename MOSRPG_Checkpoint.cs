@@ -6,7 +6,8 @@ using VRC.Udon;
 public class MOSRPG_Checkpoint : UdonSharpBehaviour
 {
     [Header("Respawn Manager")]
-    public MOSRPG_PlayerRespawnManager playerRespawnManager;
+    [Tooltip("Assign the unified MOSRPG_RespawnManager for handling player respawns.")]
+    public MOSRPG_RespawnManager respawnManager;
 
     [Header("Visual / Audio")]
     public Animator animator;
@@ -24,9 +25,9 @@ public class MOSRPG_Checkpoint : UdonSharpBehaviour
 
     public override void Interact()
     {
-        if (playerRespawnManager == null)
+        if (respawnManager == null)
         {
-            Debug.LogWarning("[MOSRPG_Checkpoint] PlayerRespawnManager reference missing!");
+            Debug.LogWarning("[MOSRPG_Checkpoint] RespawnManager reference missing!");
             return;
         }
 
@@ -36,15 +37,15 @@ public class MOSRPG_Checkpoint : UdonSharpBehaviour
             return;
         }
 
-        // Activate this checkpoint via the manager
-        playerRespawnManager.ActivateCheckpoint(this);
+        // Activate this checkpoint via the unified manager
+        respawnManager.SetPlayerCheckpoint(this);
     }
 
     // ---------------- Transform Access ----------------
 
     public Transform GetRespawnTransform()
     {
-        return (targetTransform != null) ? targetTransform : transform;
+        return targetTransform != null ? targetTransform : transform;
     }
 
     // ---------------- Activation ----------------
